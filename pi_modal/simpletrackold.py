@@ -2,10 +2,8 @@ import cv2
 from ultralytics import YOLO
 
 # Load the YOLOv8 model
-model = YOLO("yolov8n.pt")
+model = YOLO("yolov8n_ncnn_model")
 
-# Open the video file
-video_path = "path/to/video.mp4"
 cap = cv2.VideoCapture(0)
 # Loop through the video frames
 while True:
