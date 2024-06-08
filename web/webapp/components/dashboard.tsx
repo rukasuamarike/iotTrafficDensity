@@ -26,30 +26,30 @@ import { TableHead, TableRow, TableHeader, TableCell, TableBody, Table } from "@
 
 export default function Dashboard() {
   return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-100 dark:bg-gray-950">
-      <header className="flex items-center h-16 px-6 border-b border-gray-200 dark:border-gray-800 shrink-0">
+    <div className="flex flex-col w-full min-h-screen bg-gray-100 ">
+      <header className="flex items-center h-16 px-6 border-b border-gray-200 shrink-0">
         <nav className="flex items-center gap-6 text-lg font-medium md:gap-8">
           <Link className="flex items-center gap-2 text-lg font-semibold" href="#">
             <Package2Icon className="w-6 h-6" />
             <span className="sr-only">Traffic Dashboard</span>
           </Link>
-          <Link className="text-gray-500 dark:text-gray-400" href="#">
+          <Link className="text-gray-500 " href="#">
             Locations
           </Link>
-          <Link className="text-gray-500 dark:text-gray-400" href="#">
+          <Link className="text-gray-500 " href="#">
             Vehicles
           </Link>
-          <Link className="text-gray-500 dark:text-gray-400" href="#">
+          <Link className="text-gray-500 " href="#">
             Analytics
           </Link>
         </nav>
         <div className="ml-auto flex items-center gap-4">
           <Button className="rounded-full" size="icon" variant="ghost">
-            <SearchIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <SearchIcon className="w-5 h-5 text-gray-500 " />
             <span className="sr-only">Search</span>
           </Button>
           <Button className="rounded-full" size="icon" variant="ghost">
-            <BellIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <BellIcon className="w-5 h-5 text-gray-500 " />
             <span className="sr-only">Notifications</span>
           </Button>
           <Button className="rounded-full" size="icon" variant="ghost">
@@ -86,7 +86,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-5xl font-bold">45 mph</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">+2.3% from last week</div>
+              <div className="text-sm text-gray-500 ">+2.3% from last week</div>
             </CardContent>
           </Card>
           <Card>
@@ -96,7 +96,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-5xl font-bold">62%</div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">-4.1% from last week</div>
+              <div className="text-sm text-gray-500 ">-4.1% from last week</div>
             </CardContent>
           </Card>
         </div>
