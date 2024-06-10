@@ -21,15 +21,7 @@ export default function Dashboard() {
     const intervalId = setInterval(fetchData, 20000);
     return () => clearInterval(intervalId);
   }, []);
-  useEffect(() => {
-    const fetchData = async () => {
-      const trafficStatsResponse = await fetch('/api/stat').then(r=>r.json()).then(js=>js.data);
-      const vehicleLogsResponse = await fetch('/api/logs').then(r=>r.json()).then(js=>js.data);
-      setTrafficStats(trafficStatsResponse);
-      setVehicleLogs(vehicleLogsResponse);
-    };
-    fetchData();
-  }, []);
+  
   
   return (
     <div className="flex flex-col w-full min-h-screen bg-gray-100 ">
