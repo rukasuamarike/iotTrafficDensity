@@ -71,10 +71,11 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-5xl font-bold">{trafficStats
-        ? trafficStats.avg_1_hour
+        ? (Math.round(trafficStats.avg_1_hour*100)/100)
         :"loading..."
         }</div>
-              <div className="text-sm text-gray-500 ">{(trafficStats.avg_30_min)} over last 30 min</div>
+              <div className="text-sm text-gray-500 ">{(Math.round(trafficStats.avg_30_min*100)/100)} over last 30 min</div>
+              <div className="text-sm text-gray-500 ">{(Math.round(trafficStats.avg_5_min*100)/100)} over last 5 min</div>
             </CardContent>
           </Card>
           <Card>
