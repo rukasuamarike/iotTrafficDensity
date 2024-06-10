@@ -46,3 +46,22 @@ class TrafficStats:
         max_vehicles = max(counts_1_hour) if counts_1_hour else 0
         
         return avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, counts_1_min
+    
+    def calculate_trend(self):
+        # Calculate trend based on the last 15 minutes of data
+        current_time = datetime.now()
+        fifteen_minutes_ago = current_time - timedelta(minutes=15)
+        recent_counts = [count for time, count in self.per_minute_counts if time > fifteen_minutes_ago]
+
+        if len(recent_counts) < 2:
+            return 'calculating'  # Not enough data to determine trend
+
+        differences = [recent_counts[i + 1] - recent_counts[i] for i in range(len(recent_counts) - 1)]
+        avg_difference = sum(differences) / len(differences)
+
+        if avg_difference > 0.1:  # threshold for determining increasing trend
+            return 'increasing'
+        elif avg_difference < -0.1:  # threshold for determining decreasing trend
+            return 'decreasing'
+        else:
+            return 'stable'

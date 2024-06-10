@@ -27,6 +27,12 @@ def get_vehicle_logs():
     logs = list(traffic_stats.vehicle_log)
     return jsonify(logs)
 
+# Define a route to get traffic trend
+@app.route('/traffic-trend', methods=['GET'])
+def get_traffic_trend():
+    trend = traffic_stats.calculate_trend()
+    return jsonify({'trend': trend})
+
 # Run the Flask app
 def run_flask():
     app.run(host='0.0.0.0', port=5000)
