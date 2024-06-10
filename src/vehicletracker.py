@@ -100,8 +100,8 @@ def start_tracker(traffic_stats):
         cv2.putText(frame, counter_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
         # Display traffic density statistics
-        avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles = traffic_stats.calculate_stats()
-        stats_text = f"5 min avg: {avg_5_min:.2f} 30 min avg: {avg_30_min:.2f} 1 hour avg: {avg_1_hour:.2f} Min: {min_vehicles} Max: {max_vehicles}"
+        avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, current_minute_count = traffic_stats.calculate_stats()
+        stats_text = f"5 min avg: {avg_5_min:.2f} 30 min avg: {avg_30_min:.2f} 1 hour avg: {avg_1_hour:.2f} Min: {min_vehicles} Max: {max_vehicles} Current Min: {current_minute_count}"
         cv2.putText(frame, stats_text, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
 
         # Draw the ROI lines
