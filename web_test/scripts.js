@@ -1,9 +1,10 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiStatsUrl = 'https://79b3-2601-647-4d83-3930-00-f3b7.ngrok-free.app/traffic-stats';
-    const apiLogsUrl = 'https://79b3-2601-647-4d83-3930-00-f3b7.ngrok-free.app/vehicle-logs';
+    const apiStatsUrl = 'https://eb19-2601-647-4d83-3930-00-7369.ngrok-free.app/traffic-stats';
+    const apiLogsUrl = 'https://eb19-2601-647-4d83-3930-00-7369.ngrok-free.app/vehicle-logs';
     const maxLogEntries = 50;
     let vehicleLogs = [];
     let logSet = new Set();
+    let previousMinuteCount = null;
 
     async function fetchTrafficStats() {
         try {
@@ -34,8 +35,41 @@ document.addEventListener("DOMContentLoaded", function() {
             document.querySelector('.min-vehicles').textContent = data.min_vehicles;
 
             // Update current minute count
-            document.querySelector('.current-minute-count').textContent = data.current_minute_count || 'N/A';
-            document.querySelector('.current-traffic-level-text').textContent = `The current traffic level is ${data.current_minute_count || 'N/A'} vehicles per minute, which is decreasing compared to the previous period.`;
+            const currentMinuteCount = data.current_minute_count || 0;
+            document.querySelector('.current-minute-count').textContent = currentMinuteCount;
+
+            // Determine trend
+            let trendText = '';
+            let trendMessage = '';
+            let trendClass = 'bg-gray-500'; // Default to stable (grey)
+
+            if (previousMinuteCount !== null) {
+                if (currentMinuteCount > previousMinuteCount) {
+                    trendText = `Increasing`;
+                    trendMessage = `The current traffic level is ${currentMinuteCount} vehicles per minute, which is an increase over the previous period.`;
+                    trendClass = 'bg-red-500'; // Set class to red for increasing
+                } else if (currentMinuteCount < previousMinuteCount) {
+                    trendText = `Decreasing`;
+                    trendMessage = `The current traffic level is ${currentMinuteCount} vehicles per minute, which is a decrease from the previous period.`;
+                    trendClass = 'bg-green-500'; // Set class to green for decreasing
+                } else {
+                    trendText = `Stable`;
+                    trendMessage = `The current traffic level is ${currentMinuteCount} vehicles per minute, which is stable from the previous period.`;
+                }
+            } else {
+                trendText = `Collecting data...`;
+                trendMessage = `The current traffic level is ${currentMinuteCount} vehicles per minute.`;
+                trendClass = 'bg-blue-500'; // Set class to blue while collecting data
+            }
+
+            document.querySelector('.current-traffic-level-text').textContent = trendMessage;
+            const trendElement = document.querySelector('.traffic-trend');
+            trendElement.textContent = trendText;
+            trendElement.className = `rounded-full px-3 py-1 text-sm font-medium text-white traffic-trend ${trendClass}`;
+
+            // Update previous minute count
+            previousMinuteCount = currentMinuteCount;
+
         } catch (error) {
             console.error('Error fetching traffic stats:', error);
             document.querySelector('.hourly-average').textContent = 'N/A';
@@ -108,9 +142,9 @@ document.addEventListener("DOMContentLoaded", function() {
     fetchTrafficStats();
     fetchVehicleLogs();
 
-    // Re-fetch every 20 seconds
+    // Re-fetch every minute
     setInterval(() => {
         fetchTrafficStats();
         fetchVehicleLogs();
-    }, 20000);
+    }, 60000);
 });
