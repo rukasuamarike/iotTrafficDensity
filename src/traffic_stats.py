@@ -1,95 +1,132 @@
-from collections import deque
+# traffic_stats.py
 from datetime import datetime, timedelta
-import numpy as np
+from collections import deque
+import math
+
+class Vehicle:
+    def __init__(self, time_detected, vehicle_type):
+        self.time_detected = time_detected
+        self.vehicle_type = vehicle_type
 
 class TrafficStats:
     def __init__(self):
-        self.vehicle_log = deque()
-        self.per_minute_counts = []
+        self.vehicle_deque = deque()
+        self.total_vehicles_added = 0
+        self.start_time = datetime.now()
+        self.vehicles_in_current_minute = 0
+        self.current_minute_window_start = self.start_time
 
     def add_vehicle(self, vehicle_type):
+        self.update()  # Ensure we call update to handle minute changes
         current_time = datetime.now()
-        self.vehicle_log.append((current_time, vehicle_type))
-        self._update_minute_counts()
-
-    def _update_minute_counts(self):
-        current_time = datetime.now()
-        one_minute_ago = current_time - timedelta(minutes=1)
-
-        while self.vehicle_log and self.vehicle_log[0][0] < one_minute_ago:
-            self.vehicle_log.popleft()
+        vehicle = Vehicle(current_time, vehicle_type)
+        self.vehicle_deque.append(vehicle)
+        self.total_vehicles_added += 1
         
-        minute_count = len(self.vehicle_log)
-        self.per_minute_counts.append((current_time, minute_count))
+        self.vehicles_in_current_minute += 1
+        print(f"Vehicle added: {vehicle_type} at {current_time.strftime('%H:%M:%S')}. Total vehicles added so far: {self.total_vehicles_added}. Vehicles added in the current minute: {self.vehicles_in_current_minute}")
 
-        # Keep only last 60 minutes of data
+    def update(self):
+        current_time = datetime.now()
         one_hour_ago = current_time - timedelta(hours=1)
-        self.per_minute_counts = [count for count in self.per_minute_counts if count[0] >= one_hour_ago]
+        while self.vehicle_deque and self.vehicle_deque[0].time_detected < one_hour_ago:
+            self.vehicle_deque.popleft()
+
+        # Calculate current window based on start time
+        elapsed_time = (current_time - self.start_time).total_seconds()
+        new_minute_window_start = self.start_time + timedelta(minutes=int(elapsed_time // 60))
+        
+        # Reset the counter if we are in a new minute window
+        if new_minute_window_start > self.current_minute_window_start:
+            self.vehicles_in_current_minute = 0
+            self.current_minute_window_start = new_minute_window_start
+
+        print(f"Update at {current_time.strftime('%H:%M:%S')}. Vehicles in deque: {len(self.vehicle_deque)}. Current minute window: {self.current_minute_window_start.strftime('%H:%M:%S')} to {(self.current_minute_window_start + timedelta(minutes=1)).strftime('%H:%M:%S')}")
+
+    def count_vehicles_in_window(self, start_time, end_time):
+        return sum(1 for vehicle in self.vehicle_deque if start_time <= vehicle.time_detected < end_time)
+
+    def average_vehicles_over_period(self, minutes):
+        current_time = datetime.now()
+        # Round up to the next minute
+        next_minute = (current_time + timedelta(minutes=1)).replace(second=0, microsecond=0)
+        
+        # Calculate the start time for each of the last `minutes` minute windows
+        total_minutes = math.ceil((current_time - self.start_time).total_seconds() / 60)
+        if total_minutes < minutes:
+            minutes = total_minutes  # Adjust if we have less data than the requested period
+        
+        intervals = [(next_minute - timedelta(minutes=i+1), next_minute - timedelta(minutes=i)) for i in range(minutes)]
+
+        vehicle_counts = [self.count_vehicles_in_window(start, end) for start, end in intervals]
+        
+        valid_intervals = len([count for count in vehicle_counts if count > 0])
+        valid_intervals = valid_intervals if valid_intervals > 0 else 1  # To avoid division by zero
+        
+        return sum(vehicle_counts) / valid_intervals
+
+    def min_max_vehicles_last_hour(self):
+        current_time = datetime.now()
+        next_minute = (current_time + timedelta(minutes=1)).replace(second=0, microsecond=0)
+        one_hour_ago = current_time - timedelta(hours=1)
+        
+        total_minutes = math.ceil((current_time - self.start_time).total_seconds() / 60)
+        minutes = min(total_minutes, 60)  # Adjust to the last hour or the available data
+        
+        intervals = [(next_minute - timedelta(minutes=i+1), next_minute - timedelta(minutes=i)) for i in range(minutes)]
+        
+        vehicle_counts = [self.count_vehicles_in_window(start, end) for start, end in intervals]
+        
+        if not vehicle_counts:
+            return 0, 0  # No data available
+        
+        min_vehicles = min(vehicle_counts)
+        max_vehicles = max(vehicle_counts)
+        
+        return min_vehicles, max_vehicles
+
+    def determine_trend(self):
+        current_time = datetime.now()
+        total_minutes = math.ceil((current_time - self.start_time).total_seconds() / 60)
+        if total_minutes < 5:
+            return 'calculating'
+        
+        # Calculate the vehicle counts for the last 5 minutes
+        next_minute = (current_time + timedelta(minutes=1)).replace(second=0, microsecond=0)
+        intervals = [(next_minute - timedelta(minutes=i+1), next_minute - timedelta(minutes=i)) for i in range(5)]
+        vehicle_counts = [self.count_vehicles_in_window(start, end) for start, end in intervals]
+        
+        # Determine the trend based on the changes in vehicle counts
+        increasing = all(x < y for x, y in zip(vehicle_counts, vehicle_counts[1:]))
+        decreasing = all(x > y for x, y in zip(vehicle_counts, vehicle_counts[1:]))
+        
+        if increasing:
+            return 'increasing'
+        elif decreasing:
+            return 'decreasing'
+        else:
+            return 'stable'
 
     def calculate_stats(self):
-        current_time = datetime.now()
+        avg_5_min = self.average_vehicles_over_period(5)
+        avg_30_min = self.average_vehicles_over_period(30)
+        avg_1_hour = self.average_vehicles_over_period(60)
+        min_vehicles, max_vehicles = self.min_max_vehicles_last_hour()
+        current_minute_count = self.vehicles_in_current_minute
+        return avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, current_minute_count
 
-        last_5_min = current_time - timedelta(minutes=5)
-        last_30_min = current_time - timedelta(minutes=30)
-        last_1_hour = current_time - timedelta(hours=1)
-        one_minute_ago = current_time - timedelta(minutes=1)
-
-        counts_5_min = [count[1] for count in self.per_minute_counts if count[0] >= last_5_min]
-        counts_30_min = [count[1] for count in self.per_minute_counts if count[0] >= last_30_min]
-        counts_1_hour = [count[1] for count in self.per_minute_counts if count[0] >= last_1_hour]
-        counts_1_min = len([entry for entry in self.vehicle_log if entry[0] >= one_minute_ago])
-
-        avg_5_min = sum(counts_5_min) / len(counts_5_min) if counts_5_min else 0
-        avg_30_min = sum(counts_30_min) / len(counts_30_min) if counts_30_min else 0
-        avg_1_hour = sum(counts_1_hour) / len(counts_1_hour) if counts_1_hour else 0
-
-        min_vehicles = min(counts_1_hour) if counts_1_hour else 0
-        max_vehicles = max(counts_1_hour) if counts_1_hour else 0
-
-        return avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, counts_1_min
-    
     def calculate_trend(self):
-        # Calculate trend based on the last 30 minutes of data
-        current_time = datetime.now()
-        thirty_minutes_ago = current_time - timedelta(minutes=30)
-        recent_counts = [count[1] for time, count in self.per_minute_counts if time > thirty_minutes_ago]
+        trend = self.determine_trend()
         
-        is_rush_hour = self.is_rush_hour(current_time)
+        current_time = datetime.now().time()
+        morning_rush_start = datetime.strptime("07:00", "%H:%M").time()
+        morning_rush_end = datetime.strptime("09:30", "%H:%M").time()
+        evening_rush_start = datetime.strptime("15:00", "%H:%M").time()
+        evening_rush_end = datetime.strptime("17:30", "%H:%M").time()
 
-        if len(recent_counts) < 5:
-            return 'calculating', is_rush_hour  # Not enough data to determine trend
-        
-        # Exponential smoothing to give more weight to recent data
-        alpha = 0.3  # Smoothing factor, can be adjusted
-        smoothed_counts = [recent_counts[0]]  # Initialize with the first count
-
-        for count in recent_counts[1:]:
-            smoothed_counts.append(alpha * count + (1 - alpha) * smoothed_counts[-1])
-
-        differences = np.diff(smoothed_counts)
-        avg_difference = np.mean(differences)
-        std_dev = np.std(differences)
-
-        if is_rush_hour(current_time):
-            threshold_increase = std_dev * 1.5
-            threshold_decrease = -std_dev * 1.5
+        if (morning_rush_start <= current_time <= morning_rush_end) or (evening_rush_start <= current_time <= evening_rush_end):
+            is_rush_hour = True
         else:
-            threshold_increase = std_dev
-            threshold_decrease = -std_dev
+            is_rush_hour = False
 
-        # Use standard deviation to determine significant changes
-        if avg_difference > threshold_increase:
-            return 'increasing', is_rush_hour
-        elif avg_difference < threshold_decrease:
-            return 'decreasing', is_rush_hour
-        else:
-            return 'stable', is_rush_hour
-        
-    # Additional method to identify rush hours
-    def is_rush_hour(self, current_time=None):
-        if current_time is None:
-            current_time = datetime.now()
-        hour = current_time.hour
-        # Define rush hours (e.g., 7-9:30 AM and 3:00-5:30 PM)
-        return (7 <= hour <= 9.5) or (15 <= hour <= 17.5)
-    
+        return trend, is_rush_hour
