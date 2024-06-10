@@ -14,7 +14,6 @@ class TrafficStats:
     def _update_minute_counts(self):
         current_time = datetime.now()
         one_minute_ago = current_time - timedelta(minutes=1)
-        minute_count = 0
 
         while self.vehicle_log and self.vehicle_log[0][0] < one_minute_ago:
             self.vehicle_log.popleft()
@@ -32,10 +31,12 @@ class TrafficStats:
         last_5_min = current_time - timedelta(minutes=5)
         last_30_min = current_time - timedelta(minutes=30)
         last_1_hour = current_time - timedelta(hours=1)
+        one_minute_ago = current_time - timedelta(minutes=1)
         
         counts_5_min = [count[1] for count in self.per_minute_counts if count[0] >= last_5_min]
         counts_30_min = [count[1] for count in self.per_minute_counts if count[0] >= last_30_min]
         counts_1_hour = [count[1] for count in self.per_minute_counts if count[0] >= last_1_hour]
+        counts_1_min = len([entry for entry in self.vehicle_log if entry[0] >= one_minute_ago])
         
         avg_5_min = sum(counts_5_min) / len(counts_5_min) if counts_5_min else 0
         avg_30_min = sum(counts_30_min) / len(counts_30_min) if counts_30_min else 0
@@ -44,4 +45,4 @@ class TrafficStats:
         min_vehicles = min(counts_1_hour) if counts_1_hour else 0
         max_vehicles = max(counts_1_hour) if counts_1_hour else 0
         
-        return avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles
+        return avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, counts_1_min

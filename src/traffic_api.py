@@ -11,13 +11,14 @@ traffic_stats = TrafficStats()
 # Define a route to get traffic statistics
 @app.route('/traffic-stats', methods=['GET'])
 def get_traffic_stats():
-    avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles = traffic_stats.calculate_stats()
+    avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, current_minute_count = traffic_stats.calculate_stats()
     return jsonify({
         'avg_5_min': avg_5_min,
         'avg_30_min': avg_30_min,
         'avg_1_hour': avg_1_hour,
         'min_vehicles': min_vehicles,
-        'max_vehicles': max_vehicles
+        'max_vehicles': max_vehicles,
+        'current_minute_count': current_minute_count
     })
 
 # Define a route to get raw vehicle logs
