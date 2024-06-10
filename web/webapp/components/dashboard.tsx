@@ -116,8 +116,8 @@ export default function Dashboard() {
                 {
         vehicleLogs 
         ? vehicleLogs.map(elt =><TableRow>
-          <TableCell>{String(elt).split(',')[0]}</TableCell>
           <TableCell>{String(elt).split(',')[1]}</TableCell>
+          <TableCell>{(String(elt).split(',')[2])}</TableCell>
         </TableRow>)
         : <p>Loading traffic stats...</p>
       }
