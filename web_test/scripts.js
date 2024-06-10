@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiStatsUrl = '<URL>/traffic-stats';
-    const apiLogsUrl = '<URL>/vehicle-logs';
-    const apiTrendUrl = '<URL>/traffic-trend';
+    const apiStatsUrl = 'https://b556-2601-647-4d83-3930-00-f3b7.ngrok-free.app/traffic-stats';
+    const apiLogsUrl = 'https://b556-2601-647-4d83-3930-00-f3b7.ngrok-free.app/vehicle-logs';
+    const apiTrendUrl = 'https://b556-2601-647-4d83-3930-00-f3b7.ngrok-free.app/traffic-trend';
     const maxLogEntries = 50;
     let vehicleLogs = [];
     let logSet = new Set();
@@ -107,28 +107,36 @@ document.addEventListener("DOMContentLoaded", function() {
 
     async function fetchTrafficTrend() {
         try {
-            const response = await fetch(apiTrendUrl);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
+            const response = await fetch(apiTrendUrl, {
+                headers: new Headers({
+                    "ngrok-skip-browser-warning": "69420"
+                })
+            });
             const data = await response.json();
             console.log("Traffic Trend Data:", data); // Logging the data
 
             let trendText = '';
             let trendMessage = '';
+            let rushHourMessage = '';
             let trendClass = 'bg-gray-500'; // Default to stable (grey)
+
+            if (data.rush_hour) {
+                rushHourMessage = `It is currently rush hour, which lasts from 7-9:30 AM and 3:00-5:30 PM.`;
+            } else {
+                rushHourMessage = `It is currently not rush hour.`;
+            }
 
             if (data.trend === 'increasing') {
                 trendText = `Increasing`;
-                trendMessage = `The traffic level is increasing.`;
+                trendMessage = `The traffic level over the last 15 minutes is increasing.` + rushHourMessage;
                 trendClass = 'bg-red-500'; // Set class to red for increasing
             } else if (data.trend === 'decreasing') {
                 trendText = `Decreasing`;
-                trendMessage = `The traffic level is decreasing.`;
+                trendMessage = `The traffic level over the last 15 minutes is decreasing.` + rushHourMessage;
                 trendClass = 'bg-green-500'; // Set class to green for decreasing
             } else if (data) {
                 trendText = `Stable`;
-                trendMessage = `The traffic level is stable.`;
+                trendMessage = `The traffic level over the last 15 minutes has remained stable.` + rushHourMessage;
             } else {
                 trendText = `Calculating`;
                 trendMessage = `The traffic level is being calculated.`;

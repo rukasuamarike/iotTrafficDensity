@@ -30,8 +30,11 @@ def get_vehicle_logs():
 # Define a route to get traffic trend
 @app.route('/traffic-trend', methods=['GET'])
 def get_traffic_trend():
-    trend = traffic_stats.calculate_trend()
-    return jsonify({'trend': trend})
+    trend, is_rush_hour = traffic_stats.calculate_trend()
+    return jsonify({
+        'trend': trend,
+        'is_rush_hour': is_rush_hour
+    })
 
 # Run the Flask app
 def run_flask():
