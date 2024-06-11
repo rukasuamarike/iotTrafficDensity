@@ -16,7 +16,7 @@ class TrafficStats:
         self.start_time = datetime.now()
         self.vehicles_in_current_minute = 0
         self.current_minute_window_start = self.start_time
-        self.data_points = deque(maxlen=12)  # Stores last 12 data points (1 hour of 5-minute averages)
+        self.data_points = deque(maxlen=60)  # Stores last 60 data points (1 hour worth)
 
     def add_vehicle(self, vehicle_type):
         self.update()  # Ensure we call update to handle minute changes

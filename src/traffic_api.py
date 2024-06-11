@@ -1,5 +1,5 @@
 # traffic_api.py
-from flask import Flask, Response, jsonify
+from flask import Flask, jsonify
 from traffic_stats import TrafficStats
 from threading import Thread, Timer
 import vehicletracker
