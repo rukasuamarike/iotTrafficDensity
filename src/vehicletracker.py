@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 # Camera Current Frame
-current_frame = None
+#current_frame = None
 
 # COCO vehicle class IDs
 VEHICLE_CLASS_IDS = [2, 3, 5, 7]  # Car, Motorcycle, Bus, Truck
@@ -115,8 +115,8 @@ def start_tracker(traffic_stats):
         
         # Display the annotated frame
         cv2.imshow("Matejka-Amlicke Vehicle Tracker", frame)
-        
-        current_frame = frame
+
+        #current_frame = frame
         # Calculate the processing time and delay to limit frame rate
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -128,6 +128,6 @@ def start_tracker(traffic_stats):
     cap.release()
     cv2.destroyAllWindows()
 
-def get_current_frame():
-    global current_frame
-    return current_frame
+### def get_current_frame():
+    #global current_frame
+    #return current_frame

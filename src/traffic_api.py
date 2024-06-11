@@ -43,7 +43,7 @@ def get_traffic_trend():
 def get_data_points():
     return jsonify(list(traffic_stats.data_points))
 
-def generate_frames():
+###def generate_frames():
     while True:
         frame = vehicletracker.get_current_frame()
         if frame is None:
@@ -55,8 +55,8 @@ def generate_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-@app.route('/video_feed')
-def video_feed():
+#@app.route('/video_feed')
+###def video_feed():
     return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 # Function to periodically update data points

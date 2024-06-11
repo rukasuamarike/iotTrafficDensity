@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const videoFeedUrl = `${serverUrl}/video_feed`;
 
     // Set the src of the camera feed image
-    document.getElementById('camera-feed').src = videoFeedUrl;
+    //document.getElementById('camera-feed').src = videoFeedUrl;
 
     const maxLogEntries = 50;
     let vehicleLogs = [];
