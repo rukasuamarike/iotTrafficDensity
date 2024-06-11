@@ -114,7 +114,8 @@ class TrafficStats:
         avg_30_min = self.average_vehicles_over_period(30)
         avg_1_hour = self.average_vehicles_over_period(60)
         min_vehicles, max_vehicles = self.min_max_vehicles_last_hour()
-        current_minute_count = self.vehicles_in_current_minute
+        current_minute_start = datetime.now() - timedelta(minutes=1)
+        current_minute_count = self.count_vehicles_in_window(current_minute_start, datetime.now())
         return avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, current_minute_count
 
     def calculate_trend(self):
