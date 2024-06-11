@@ -1,8 +1,8 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiStatsUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-stats';
-    const apiLogsUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/vehicle-logs';
-    const apiTrendUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-trend';
-    const apiDataPointsUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/data-points';
+    const apiStatsUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-stats';
+    const apiLogsUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/vehicle-logs';
+    const apiTrendUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-trend';
+    const apiDataPointsUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/data-points';
     const maxLogEntries = 50;
     let vehicleLogs = [];
     let logSet = new Set();
@@ -221,5 +221,5 @@ document.addEventListener("DOMContentLoaded", function() {
         fetchVehicleLogs();
         fetchTrafficTrend();
         fetchDataPoints();
-    }, 60000);
+    }, 10000);
 });
