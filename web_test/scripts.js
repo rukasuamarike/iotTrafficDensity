@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiStatsUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-stats';
-    const apiLogsUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/vehicle-logs';
-    const apiTrendUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-trend';
-    const apiDataPointsUrl = 'https://b5e6-2601-647-4d83-3930-00-6dc.ngrok-free.app/data-points';
+    const apiStatsUrl = `${serverUrl}/traffic-stats`;
+    const apiLogsUrl = `${serverUrl}/vehicle-logs`;
+    const apiTrendUrl = `${serverUrl}/traffic-trend`;
+    const apiDataPointsUrl = `${serverUrl}/data-points`;
+
     const maxLogEntries = 50;
     let vehicleLogs = [];
     let logSet = new Set();
@@ -26,10 +27,19 @@ document.addEventListener("DOMContentLoaded", function() {
                     type: 'time',
                     time: {
                         unit: 'minute'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Time'
                     }
                 },
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Average Cars Per Minute (5-Min-AVG)'
+                    },
+                    suggestedMax: 10  // Default value which will be updated dynamically
                 }
             }
         }
@@ -196,11 +206,19 @@ document.addEventListener("DOMContentLoaded", function() {
             trafficVolumeChart.data.labels = [];
             trafficVolumeChart.data.datasets[0].data = [];
 
+            let maxValue = 0;
+
             // Populate chart with new data
             data.forEach(point => {
                 trafficVolumeChart.data.labels.push(new Date(point.timestamp));
                 trafficVolumeChart.data.datasets[0].data.push(point.average);
+                if (point.average > maxValue) {
+                    maxValue = point.average;
+                }
             });
+
+            // Update the suggestedMax value
+            trafficVolumeChart.options.scales.y.suggestedMax = maxValue + 5;
 
             trafficVolumeChart.update();
 

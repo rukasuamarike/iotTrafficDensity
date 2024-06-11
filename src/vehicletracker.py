@@ -3,6 +3,9 @@ from ultralytics import YOLO
 import time
 import numpy as np
 
+# Camera Current Frame
+current_frame = None
+
 # COCO vehicle class IDs
 VEHICLE_CLASS_IDS = [2, 3, 5, 7]  # Car, Motorcycle, Bus, Truck
 
@@ -33,6 +36,7 @@ class_id_to_vehicle_type = {
 }
 
 def start_tracker(traffic_stats):
+    global current_frame
     # Load the model
     model = YOLO("yolov8s_full_integer_quant_edgetpu.tflite")
 
@@ -59,6 +63,7 @@ def start_tracker(traffic_stats):
             print("Error: Can't receive frame! Exiting....")
             break
 
+        current_frame = frame
         # Run tracking on the frame, persisting tracks between frames
         results = model.track(frame, persist=True, imgsz=480)
 
@@ -121,3 +126,7 @@ def start_tracker(traffic_stats):
     # Release the video capture object and close the display window
     cap.release()
     cv2.destroyAllWindows()
+
+def get_current_frame():
+    global current_frame
+    return current_frame
