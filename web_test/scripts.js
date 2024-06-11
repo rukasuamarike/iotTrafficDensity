@@ -1,10 +1,39 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiStatsUrl = 'https://65fc-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-stats';
-    const apiLogsUrl = 'https://65fc-2601-647-4d83-3930-00-6dc.ngrok-free.app/vehicle-logs';
-    const apiTrendUrl = 'https://65fc-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-trend';
+    const apiStatsUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-stats';
+    const apiLogsUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/vehicle-logs';
+    const apiTrendUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-trend';
+    const apiDataPointsUrl = 'https://fd25-2601-647-4d83-3930-00-6dc.ngrok-free.app/data-points';
     const maxLogEntries = 50;
     let vehicleLogs = [];
     let logSet = new Set();
+
+    const ctx = document.getElementById('trafficVolumeChart').getContext('2d');
+    const trafficVolumeChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Traffic Volume',
+                data: [],
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'minute'
+                    }
+                },
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 
     async function fetchTrafficStats() {
         try {
@@ -15,12 +44,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const text = await response.text();
-                console.error("Received non-JSON response:", text);
-                throw new TypeError("Received non-JSON response");
             }
             const data = await response.json();
             console.log("Traffic Stats Data:", data); // Logging the data
@@ -58,12 +81,6 @@ document.addEventListener("DOMContentLoaded", function() {
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const text = await response.text();
-                console.error("Received non-JSON response:", text);
-                throw new TypeError("Received non-JSON response");
             }
             const data = await response.json();
             console.log("Vehicle Logs Data:", data); // Logging the data
@@ -148,6 +165,11 @@ document.addEventListener("DOMContentLoaded", function() {
             trendElement.textContent = trendText;
             trendElement.className = `rounded-full px-3 py-1 text-sm font-medium text-white traffic-trend ${trendClass}`;
 
+            // Update the Chart.js data
+            trafficVolumeChart.data.labels.push(new Date());
+            trafficVolumeChart.data.datasets[0].data.push(data.current_minute_count);
+            trafficVolumeChart.update();
+
         } catch (error) {
             console.error('Error fetching traffic trend:', error);
             document.querySelector('.current-traffic-level-text').textContent = 'The current traffic level is N/A.';
@@ -157,15 +179,47 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
 
+    async function fetchDataPoints() {
+        try {
+            const response = await fetch(apiDataPointsUrl, {
+                headers: new Headers({
+                    "ngrok-skip-browser-warning": "69420"
+                })
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("Data Points:", data); // Logging the data
+
+            // Clear existing data
+            trafficVolumeChart.data.labels = [];
+            trafficVolumeChart.data.datasets[0].data = [];
+
+            // Populate chart with new data
+            data.forEach(point => {
+                trafficVolumeChart.data.labels.push(new Date(point.timestamp));
+                trafficVolumeChart.data.datasets[0].data.push(point.average);
+            });
+
+            trafficVolumeChart.update();
+
+        } catch (error) {
+            console.error('Error fetching data points:', error);
+        }
+    }
+
     // Initial fetch
     fetchTrafficStats();
     fetchVehicleLogs();
     fetchTrafficTrend();
+    fetchDataPoints();
 
     // Re-fetch every minute
     setInterval(() => {
         fetchTrafficStats();
         fetchVehicleLogs();
         fetchTrafficTrend();
+        fetchDataPoints();
     }, 60000);
 });

@@ -115,6 +115,8 @@ class TrafficStats:
             return 'stable'
 
     def update_data_points(self):
+        if self.data_points and (datetime.now() - datetime.strptime(self.data_points[-1]['timestamp'], "%Y-%m-%d %H:%M:%S")).total_seconds() < 300:
+            return
         avg_5_min = self.average_vehicles_over_period(5)
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.data_points.append({'timestamp': current_time, 'average': avg_5_min})
