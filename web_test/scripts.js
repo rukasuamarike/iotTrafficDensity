@@ -1,8 +1,13 @@
 document.addEventListener("DOMContentLoaded", function() {
+    // Load the server URL from config.js
     const apiStatsUrl = `${serverUrl}/traffic-stats`;
     const apiLogsUrl = `${serverUrl}/vehicle-logs`;
     const apiTrendUrl = `${serverUrl}/traffic-trend`;
     const apiDataPointsUrl = `${serverUrl}/data-points`;
+    const videoFeedUrl = `${serverUrl}/video_feed`;
+
+    // Set the src of the camera feed image
+    document.getElementById('camera-feed').src = videoFeedUrl;
 
     const maxLogEntries = 50;
     let vehicleLogs = [];

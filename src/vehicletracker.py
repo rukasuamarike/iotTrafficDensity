@@ -63,7 +63,7 @@ def start_tracker(traffic_stats):
             print("Error: Can't receive frame! Exiting....")
             break
 
-        current_frame = frame
+        
         # Run tracking on the frame, persisting tracks between frames
         results = model.track(frame, persist=True, imgsz=480)
 
@@ -115,7 +115,8 @@ def start_tracker(traffic_stats):
         
         # Display the annotated frame
         cv2.imshow("Matejka-Amlicke Vehicle Tracker", frame)
-
+        
+        current_frame = frame
         # Calculate the processing time and delay to limit frame rate
         end_time = time.time()
         elapsed_time = end_time - start_time
