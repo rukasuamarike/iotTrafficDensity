@@ -44,9 +44,8 @@ class TrafficStats:
             self.vehicles_in_current_minute = 0
             self.current_minute_window_start = new_minute_window_start
 
-        # Update 5-minute averages every 5 minutes
-        if int(elapsed_time // 60) % 5 == 0:
-            self.update_data_points()
+        
+        self.update_data_points()
 
         print(f"Update at {current_time.strftime('%H:%M:%S')}. Vehicles in deque: {len(self.vehicle_deque)}. Current minute window: {self.current_minute_window_start.strftime('%H:%M:%S')} to {(self.current_minute_window_start + timedelta(minutes=1)).strftime('%H:%M:%S')}")
 
