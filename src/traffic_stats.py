@@ -1,13 +1,23 @@
+"""
 # traffic_stats.py
+# tores vehicle data and calculates traffic statistics.
+# Owen Matejka
+# CSEN 143
+# Last Updated: 6/10/2024
+"""
+
+# Imports
 from datetime import datetime, timedelta
 from collections import deque
 import math
 
+# Vehicle class
 class Vehicle:
     def __init__(self, time_detected, vehicle_type):
         self.time_detected = time_detected
         self.vehicle_type = vehicle_type
 
+# TrafficStats class
 class TrafficStats:
     def __init__(self):
         self.vehicle_deque = deque()
@@ -17,9 +27,10 @@ class TrafficStats:
         self.vehicles_in_current_minute = 0
         self.current_minute_window_start = self.start_time
         self.data_points = deque(maxlen=60)  # Stores last 60 data points (1 hour worth)
-
+    
+    # Add a vehicle to the deque and log the vehicle
     def add_vehicle(self, vehicle_type):
-        self.update()  # Ensure we call update to handle minute changes
+        self.update()  # Call update to handle minute changes
         current_time = datetime.now()
         vehicle = Vehicle(current_time, vehicle_type)
         self.vehicle_deque.append(vehicle)
@@ -27,8 +38,8 @@ class TrafficStats:
         self.total_vehicles_added += 1
         
         self.vehicles_in_current_minute += 1
-        print(f"Vehicle added: {vehicle_type} at {current_time.strftime('%H:%M:%S')}. Total vehicles added so far: {self.total_vehicles_added}. Vehicles added in the current minute: {self.vehicles_in_current_minute}")
 
+    # Update the data
     def update(self):
         current_time = datetime.now()
         one_hour_ago = current_time - timedelta(hours=1)
@@ -47,11 +58,11 @@ class TrafficStats:
         
         self.update_data_points()
 
-        print(f"Update at {current_time.strftime('%H:%M:%S')}. Vehicles in deque: {len(self.vehicle_deque)}. Current minute window: {self.current_minute_window_start.strftime('%H:%M:%S')} to {(self.current_minute_window_start + timedelta(minutes=1)).strftime('%H:%M:%S')}")
-
+    # Count the number of vehicles in a given time window
     def count_vehicles_in_window(self, start_time, end_time):
         return sum(1 for vehicle in self.vehicle_deque if start_time <= vehicle.time_detected < end_time)
 
+    # Calculate the average number of vehicles over a given period
     def average_vehicles_over_period(self, minutes):
         current_time = datetime.now()
         # Round up to the next minute
@@ -71,6 +82,7 @@ class TrafficStats:
         
         return sum(vehicle_counts) / valid_intervals
 
+    # Calculate the minimum and maximum number of vehicles in the last hour
     def min_max_vehicles_last_hour(self):
         current_time = datetime.now()
         next_minute = (current_time + timedelta(minutes=1)).replace(second=0, microsecond=0)
@@ -91,6 +103,7 @@ class TrafficStats:
         
         return min_vehicles, max_vehicles
 
+    # Determine the trend in the last 5 minutes
     def determine_trend(self):
         current_time = datetime.now()
         total_minutes = math.ceil((current_time - self.start_time).total_seconds() / 60)
@@ -113,6 +126,7 @@ class TrafficStats:
         else:
             return 'stable'
 
+    # Update the data points
     def update_data_points(self):
         if self.data_points and (datetime.now() - datetime.strptime(self.data_points[-1]['timestamp'], "%Y-%m-%d %H:%M:%S")).total_seconds() < 60:
             return
@@ -120,6 +134,7 @@ class TrafficStats:
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.data_points.append({'timestamp': current_time, 'average': avg_5_min})
 
+    # Calculate the traffic statistics
     def calculate_stats(self):
         avg_5_min = self.average_vehicles_over_period(5)
         avg_30_min = self.average_vehicles_over_period(30)
@@ -129,6 +144,7 @@ class TrafficStats:
         current_minute_count = self.count_vehicles_in_window(current_minute_start, datetime.now())
         return avg_5_min, avg_30_min, avg_1_hour, min_vehicles, max_vehicles, current_minute_count
 
+    # Calculate the traffic trend
     def calculate_trend(self):
         trend = self.determine_trend()
         

@@ -1,10 +1,16 @@
+"""
+# vehicletracker.py
+# Uses YOLOv8 to detect vehicles and tracks them to calculate traffic statistics.
+# Owen Matejka
+# CSEN 143
+# Last Updated: 6/10/2024
+"""
+
+# Imports
 import cv2
 from ultralytics import YOLO
 import time
 import numpy as np
-
-# Camera Current Frame
-#current_frame = None
 
 # COCO vehicle class IDs
 VEHICLE_CLASS_IDS = [2, 3, 5, 7]  # Car, Motorcycle, Bus, Truck
@@ -21,7 +27,7 @@ def get_center(bbox):
 # Calculate the direction of movement
 def get_direction(center, previous_center):
     if previous_center:
-        if center[0] > previous_center[0]:
+        if center[0] > previous_center[0]: # Given we have the bounding lines as well, extra precision doesn't need to be added
             return "right"
         elif center[0] < previous_center[0]:
             return "left"
@@ -116,7 +122,7 @@ def start_tracker(traffic_stats):
         # Display the annotated frame
         cv2.imshow("Matejka-Amlicke Vehicle Tracker", frame)
 
-        #current_frame = frame
+        
         # Calculate the processing time and delay to limit frame rate
         end_time = time.time()
         elapsed_time = end_time - start_time
@@ -127,7 +133,3 @@ def start_tracker(traffic_stats):
     # Release the video capture object and close the display window
     cap.release()
     cv2.destroyAllWindows()
-
-### def get_current_frame():
-    #global current_frame
-    #return current_frame
