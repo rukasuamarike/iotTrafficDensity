@@ -1,4 +1,5 @@
-# CSEN 143 Traffic Density System
+# Traffic Density System
+## CSEN 143 -- June 2024
 
 This project calculates the Northbound traffic density on Lafayette Street in Santa Clara using YOLOv8, a Raspberry Pi 5, and a Google Coral TPU. Developed for the CSEN 143 (Internet of Things) course, it provides real-time traffic analysis and visualization.
 
