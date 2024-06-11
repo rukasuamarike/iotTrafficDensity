@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function() {
-    const apiStatsUrl = 'https://a5d2-2601-647-4d83-3930-00-f3b7.ngrok-free.app/traffic-stats';
-    const apiLogsUrl = 'https://a5d2-2601-647-4d83-3930-00-f3b7.ngrok-free.app/vehicle-logs';
-    const apiTrendUrl = 'https://a5d2-2601-647-4d83-3930-00-f3b7.ngrok-free.app/traffic-trend';
+    const apiStatsUrl = 'https://2c23-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-stats';
+    const apiLogsUrl = 'https://2c23-2601-647-4d83-3930-00-6dc.ngrok-free.app/vehicle-logs';
+    const apiTrendUrl = 'https://2c23-2601-647-4d83-3930-00-6dc.ngrok-free.app/traffic-trend';
     const maxLogEntries = 50;
     let vehicleLogs = [];
     let logSet = new Set();

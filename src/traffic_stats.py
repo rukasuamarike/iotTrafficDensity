@@ -11,6 +11,7 @@ class Vehicle:
 class TrafficStats:
     def __init__(self):
         self.vehicle_deque = deque()
+        self.vehicle_log = deque(maxlen=100)
         self.total_vehicles_added = 0
         self.start_time = datetime.now()
         self.vehicles_in_current_minute = 0
@@ -21,6 +22,7 @@ class TrafficStats:
         current_time = datetime.now()
         vehicle = Vehicle(current_time, vehicle_type)
         self.vehicle_deque.append(vehicle)
+        self.vehicle_log.append((current_time.strftime("%Y-%m-%d %H:%M:%S"), vehicle_type))  # Log the vehicle
         self.total_vehicles_added += 1
         
         self.vehicles_in_current_minute += 1
