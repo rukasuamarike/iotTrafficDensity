@@ -16,6 +16,7 @@ class TrafficStats:
         self.start_time = datetime.now()
         self.vehicles_in_current_minute = 0
         self.current_minute_window_start = self.start_time
+        self.data_points = deque(maxlen=12)  # Stores last 12 data points (1 hour of 5-minute averages)
 
     def add_vehicle(self, vehicle_type):
         self.update()  # Ensure we call update to handle minute changes
@@ -42,6 +43,10 @@ class TrafficStats:
         if new_minute_window_start > self.current_minute_window_start:
             self.vehicles_in_current_minute = 0
             self.current_minute_window_start = new_minute_window_start
+
+        # Update 5-minute averages every 5 minutes
+        if int(elapsed_time // 60) % 5 == 0:
+            self.update_data_points()
 
         print(f"Update at {current_time.strftime('%H:%M:%S')}. Vehicles in deque: {len(self.vehicle_deque)}. Current minute window: {self.current_minute_window_start.strftime('%H:%M:%S')} to {(self.current_minute_window_start + timedelta(minutes=1)).strftime('%H:%M:%S')}")
 
@@ -108,6 +113,11 @@ class TrafficStats:
             return 'decreasing'
         else:
             return 'stable'
+
+    def update_data_points(self):
+        avg_5_min = self.average_vehicles_over_period(5)
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.data_points.append({'timestamp': current_time, 'average': avg_5_min})
 
     def calculate_stats(self):
         avg_5_min = self.average_vehicles_over_period(5)

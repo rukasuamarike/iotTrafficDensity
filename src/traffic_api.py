@@ -1,6 +1,7 @@
+# traffic_api.py
 from flask import Flask, jsonify
 from traffic_stats import TrafficStats
-from threading import Thread
+from threading import Thread, Timer
 import vehicletracker
 
 app = Flask(__name__)
@@ -36,6 +37,16 @@ def get_traffic_trend():
         'is_rush_hour': is_rush_hour
     })
 
+# Define a route to get 5-minute averages for the last hour
+@app.route('/data-points', methods=['GET'])
+def get_data_points():
+    return jsonify(list(traffic_stats.data_points))
+
+# Function to periodically update data points
+def periodic_update():
+    traffic_stats.update_data_points()
+    Timer(90, periodic_update).start()
+
 # Run the Flask app
 def run_flask():
     app.run(host='0.0.0.0', port=5000)
@@ -47,3 +58,6 @@ if __name__ == '__main__':
     
     # Start the vehicle tracker
     vehicletracker.start_tracker(traffic_stats)
+    
+    # Start periodic update
+    periodic_update()
